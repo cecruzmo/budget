@@ -1,4 +1,4 @@
-package com.cecruzmo.budget
+package com.cecruzmo.budget.dev
 
 import io.flutter.embedding.android.FlutterActivity
 
