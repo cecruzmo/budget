@@ -12,7 +12,11 @@ A Flutter application for shared budget and expense tracking. This app helps use
    - Android Studio v2021.3 or higher
    - XCode v16.0 or higher
 
-2. Run the app:
+2. Configure Firebase:
+   - Download and copy `google-services.json` file at `android/app` folder to configure Android
+   - Download and copy `GoogleServices-Info.plist` file at `ios` folder to configure iOS
+
+3. Run the app:
    - In Cursor IDE, open the terminal (View -> Terminal)
    - Install dependencies: execute `flutter pub get`
    - Execute `flutter run` to start the app
