@@ -9,7 +9,7 @@ class UserService {
   UserService(this._repository);
 
   Future<UserModel> initUser() async {
-    final currentUser = await getCurrentUser();
+    final currentUser = getCurrentUser();
     if (currentUser == null) return await createAnonymousUser();
     return currentUser;
   }
@@ -17,7 +17,7 @@ class UserService {
   Future<UserModel> createAnonymousUser() async =>
       await _repository.createAnonymousUser();
 
-  Future<UserModel?> getCurrentUser() async => _repository.getCurrentUser();
+  UserModel? getCurrentUser() => _repository.getCurrentUser();
 }
 
 final userServiceProvider = Provider<UserService>((ref) {

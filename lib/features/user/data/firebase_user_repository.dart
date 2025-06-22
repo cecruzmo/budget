@@ -11,7 +11,7 @@ class FirebaseUserRepository implements UserRepository {
     : _auth = auth ?? FirebaseAuth.instance;
 
   @override
-  Future<UserModel?> getCurrentUser() async {
+  UserModel? getCurrentUser() {
     final firebaseUser = _auth.currentUser;
     if (firebaseUser == null) return null;
     return UserModel(
