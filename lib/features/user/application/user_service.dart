@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:budget/features/user/domain/user_model.dart';
-import 'package:budget/features/user/domain/user_repository.dart';
+import 'package:budget/features/user/data/user_repository.dart';
 
 class UserService {
   final UserRepository _repository;

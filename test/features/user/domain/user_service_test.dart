@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:budget/features/user/domain/user_model.dart';
-import 'package:budget/features/user/domain/user_repository.dart';
-import 'package:budget/features/user/domain/user_service.dart';
+import 'package:budget/features/user/data/user_repository.dart';
+import 'package:budget/features/user/application/user_service.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 
