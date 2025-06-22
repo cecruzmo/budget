@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:budget/features/user/domain/user_model.dart';
-import 'package:budget/features/user/domain/user_service.dart';
+import 'package:budget/features/user/application/user_service.dart';
 
 class UserController extends StateNotifier<AsyncValue<UserModel?>> {
   final UserService _userService;

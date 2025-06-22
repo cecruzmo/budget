@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:budget/features/user/domain/user_model.dart';
-import 'package:budget/features/user/domain/user_repository.dart';
+import 'package:budget/features/user/data/user_repository.dart';
 
 class FirebaseUserRepository implements UserRepository {
   final FirebaseAuth _auth;
