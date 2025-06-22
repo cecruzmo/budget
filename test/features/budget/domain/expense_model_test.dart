@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:budget/features/home/domain/expense_model.dart';
+import 'package:budget/features/budget/domain/expense_model.dart';
 
 void main() {
   group('ExpenseModel', () {

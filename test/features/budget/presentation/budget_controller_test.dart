@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:budget/features/home/presentation/budget_controller.dart';
-import 'package:budget/features/home/application/budget_service.dart';
-import 'package:budget/features/home/domain/expense_model.dart';
+import 'package:budget/features/budget/presentation/budget_controller.dart';
+import 'package:budget/features/budget/application/budget_service.dart';
+import 'package:budget/features/budget/domain/expense_model.dart';
 
 class MockBudgetService implements BudgetService {
   List<ExpenseModel>? _mockExpenses;

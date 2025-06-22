@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:budget/features/home/data/budget_repository.dart';
-import 'package:budget/features/home/domain/expense_model.dart';
+import 'package:budget/features/budget/data/budget_repository.dart';
+import 'package:budget/features/budget/domain/expense_model.dart';
 
 class BudgetService {
   final BudgetRepository _budgetRepository;

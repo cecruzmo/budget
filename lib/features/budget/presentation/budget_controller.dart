@@ -1,5 +1,5 @@
-import 'package:budget/features/home/application/budget_service.dart';
-import 'package:budget/features/home/domain/expense_model.dart';
+import 'package:budget/features/budget/application/budget_service.dart';
+import 'package:budget/features/budget/domain/expense_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BudgetController extends StateNotifier<AsyncValue<List<ExpenseModel>>> {
@@ -15,6 +15,6 @@ final budgetControllerProvider =
     StateNotifierProvider<BudgetController, AsyncValue<List<ExpenseModel>>>((
       ref,
     ) {
-  final budgetService = ref.watch(budgetServiceProvider);
-  return BudgetController(budgetService);
-});
+      final budgetService = ref.watch(budgetServiceProvider);
+      return BudgetController(budgetService);
+    });

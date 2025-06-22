@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:budget/features/home/presentation/budget_controller.dart';
+import 'package:budget/features/budget/presentation/budget_controller.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+class BudgetScreen extends ConsumerStatefulWidget {
+  const BudgetScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<BudgetScreen> createState() => _BudgetScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   @override
   void initState() {
     super.initState();

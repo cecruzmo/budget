@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:budget/features/home/presentation/home_screen.dart';
+import 'package:budget/features/budget/presentation/budget_screen.dart';
 import 'package:budget/features/user/presentation/user_controller.dart';
 
 void main() async {
@@ -17,6 +17,6 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(userControllerProvider.notifier).initUser();
-    return MaterialApp(home: const HomeScreen());
+    return MaterialApp(home: const BudgetScreen());
   }
 }

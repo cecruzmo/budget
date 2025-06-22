@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:budget/features/home/application/budget_service.dart';
-import 'package:budget/features/home/data/budget_repository.dart';
-import 'package:budget/features/home/domain/expense_model.dart';
+import 'package:budget/features/budget/application/budget_service.dart';
+import 'package:budget/features/budget/data/budget_repository.dart';
+import 'package:budget/features/budget/domain/expense_model.dart';
 
 class MockBudgetRepository extends Mock implements BudgetRepository {}
 

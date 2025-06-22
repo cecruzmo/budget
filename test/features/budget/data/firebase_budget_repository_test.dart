@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:budget/features/home/data/firebase_budget_repository.dart';
-import 'package:budget/features/home/data/budget_repository.dart';
+import 'package:budget/features/budget/data/firebase_budget_repository.dart';
+import 'package:budget/features/budget/data/budget_repository.dart';
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
