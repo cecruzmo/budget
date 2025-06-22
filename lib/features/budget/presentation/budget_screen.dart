@@ -22,20 +22,71 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: Column(children: [_expensesList(context)])),
+      body: SafeArea(
+        child: Column(
+          children: [_totalExpenseCard(context), _expensesList(context)],
+        ),
+      ),
+    );
+  }
+
+  Widget _totalExpenseCard(BuildContext context) {
+    final budgetAsync = ref.watch(budgetControllerProvider);
+    return budgetAsync.when(
+      data: (budgetModel) => Card(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Text(
+                'Total Expenses',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '\$${budgetModel.totalExpense.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      loading: () => const Card(
+        margin: EdgeInsets.all(16),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (error, stackTrace) => Card(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Center(
+            child: Text(
+              'Error: $error',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _expensesList(BuildContext context) {
-    final expensesAsync = ref.watch(budgetControllerProvider);
-    return expensesAsync.when(
-      data: (expenses) => Expanded(
-        child: expenses.isEmpty
+    final budgetAsync = ref.watch(budgetControllerProvider);
+    return budgetAsync.when(
+      data: (budgetModel) => Expanded(
+        child: budgetModel.expenses.isEmpty
             ? const Center(child: Text('No expenses found'))
             : ListView.builder(
-                itemCount: expenses.length,
+                itemCount: budgetModel.expenses.length,
                 itemBuilder: (context, index) {
-                  final expense = expenses[index];
+                  final expense = budgetModel.expenses[index];
                   return ListTile(
                     title: Text(expense.name),
                     subtitle: Text(expense.createdAt.toString()),
@@ -47,11 +98,14 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
                 },
               ),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => Center(
-        child: Text(
-          'Error: $error',
-          style: Theme.of(context).textTheme.bodyLarge,
+      loading: () =>
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+      error: (error, stackTrace) => Expanded(
+        child: Center(
+          child: Text(
+            'Error: $error',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
       ),
     );

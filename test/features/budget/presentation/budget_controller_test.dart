@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:budget/features/budget/presentation/budget_controller.dart';
 import 'package:budget/features/budget/application/budget_service.dart';
 import 'package:budget/features/budget/domain/expense_model.dart';
+import 'package:budget/features/budget/domain/budget_model.dart';
 
 class MockBudgetService implements BudgetService {
   List<ExpenseModel>? _mockExpenses;
@@ -57,10 +58,10 @@ void main() {
       final state = container.read(budgetControllerProvider);
 
       // Assert
-      expect(state, isA<AsyncLoading<List<ExpenseModel>>>());
+      expect(state, isA<AsyncLoading<BudgetModel>>());
     });
 
-    test('should fetch expenses successfully', () async {
+    test('should fetch expenses successfully and calculate total', () async {
       // Arrange
       final mockExpenses = [
         ExpenseModel(
@@ -82,25 +83,26 @@ void main() {
       // Act
       expect(
         container.read(budgetControllerProvider),
-        isA<AsyncLoading<List<ExpenseModel>>>(),
+        isA<AsyncLoading<BudgetModel>>(),
       );
       await controller.fetchExpenses();
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
-      final data = state.value;
-      expect(data, isNotNull);
-      expect(data!.length, equals(2));
-      expect(data[0].id, equals('1'));
-      expect(data[0].name, equals('Groceries'));
-      expect(data[0].amount, equals(50.0));
-      expect(data[1].id, equals('2'));
-      expect(data[1].name, equals('Gas'));
-      expect(data[1].amount, equals(30.0));
+      expect(state, isA<AsyncData<BudgetModel>>());
+      final budgetModel = state.value;
+      expect(budgetModel, isNotNull);
+      expect(budgetModel!.expenses.length, equals(2));
+      expect(budgetModel.totalExpense, equals(80.0));
+      expect(budgetModel.expenses[0].id, equals('1'));
+      expect(budgetModel.expenses[0].name, equals('Groceries'));
+      expect(budgetModel.expenses[0].amount, equals(50.0));
+      expect(budgetModel.expenses[1].id, equals('2'));
+      expect(budgetModel.expenses[1].name, equals('Gas'));
+      expect(budgetModel.expenses[1].amount, equals(30.0));
     });
 
-    test('should handle empty expenses list', () async {
+    test('should handle empty expenses list with zero total', () async {
       // Arrange
       mockBudgetService.setMockExpenses([]);
       final controller = container.read(budgetControllerProvider.notifier);
@@ -110,10 +112,11 @@ void main() {
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
-      final data = state.value;
-      expect(data, isNotNull);
-      expect(data!.isEmpty, isTrue);
+      expect(state, isA<AsyncData<BudgetModel>>());
+      final budgetModel = state.value;
+      expect(budgetModel, isNotNull);
+      expect(budgetModel!.expenses.isEmpty, isTrue);
+      expect(budgetModel.totalExpense, equals(0.0));
     });
 
     test('should handle fetch expenses error', () async {
@@ -127,7 +130,7 @@ void main() {
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncError<List<ExpenseModel>>>());
+      expect(state, isA<AsyncError<BudgetModel>>());
       final error = state.error;
       expect(error, isNotNull);
       expect(error, equals(mockError));
@@ -144,7 +147,7 @@ void main() {
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncError<List<ExpenseModel>>>());
+      expect(state, isA<AsyncError<BudgetModel>>());
       expect(state.error, equals(mockError));
     });
 
@@ -165,13 +168,13 @@ void main() {
       final fetchFuture = controller.fetchExpenses();
       expect(
         container.read(budgetControllerProvider),
-        isA<AsyncLoading<List<ExpenseModel>>>(),
+        isA<AsyncLoading<BudgetModel>>(),
       );
       await fetchFuture;
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
+      expect(state, isA<AsyncData<BudgetModel>>());
     });
 
     test('should handle multiple consecutive fetch calls', () async {
@@ -198,17 +201,19 @@ void main() {
       mockBudgetService.setMockExpenses(firstExpenses);
       await controller.fetchExpenses();
       var state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
-      expect(state.value!.length, equals(1));
-      expect(state.value![0].name, equals('First Expense'));
+      expect(state, isA<AsyncData<BudgetModel>>());
+      expect(state.value!.expenses.length, equals(1));
+      expect(state.value!.totalExpense, equals(10.0));
+      expect(state.value!.expenses[0].name, equals('First Expense'));
 
       // Act & Assert (Second fetch)
       mockBudgetService.setMockExpenses(secondExpenses);
       await controller.fetchExpenses();
       state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
-      expect(state.value!.length, equals(1));
-      expect(state.value![0].name, equals('Second Expense'));
+      expect(state, isA<AsyncData<BudgetModel>>());
+      expect(state.value!.expenses.length, equals(1));
+      expect(state.value!.totalExpense, equals(20.0));
+      expect(state.value!.expenses[0].name, equals('Second Expense'));
     });
 
     test('should handle fetch after error state', () async {
@@ -220,7 +225,7 @@ void main() {
       // Act & Assert (Error fetch)
       await controller.fetchExpenses();
       var state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncError<List<ExpenseModel>>>());
+      expect(state, isA<AsyncError<BudgetModel>>());
 
       // Arrange (set up success)
       final mockExpenses = [
@@ -236,9 +241,10 @@ void main() {
       // Act & Assert (Success fetch)
       await controller.fetchExpenses();
       state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
-      expect(state.value!.length, equals(1));
-      expect(state.value![0].name, equals('Recovery Expense'));
+      expect(state, isA<AsyncData<BudgetModel>>());
+      expect(state.value!.expenses.length, equals(1));
+      expect(state.value!.totalExpense, equals(15.0));
+      expect(state.value!.expenses[0].name, equals('Recovery Expense'));
     });
 
     test('should maintain state consistency across multiple reads', () async {
@@ -263,8 +269,9 @@ void main() {
       final state3 = container.read(budgetControllerProvider);
       expect(state1, equals(state2));
       expect(state2, equals(state3));
-      expect(state1.value!.length, equals(1));
-      expect(state1.value![0].amount, equals(100.0));
+      expect(state1.value!.expenses.length, equals(1));
+      expect(state1.value!.totalExpense, equals(100.0));
+      expect(state1.value!.expenses[0].amount, equals(100.0));
     });
 
     test('should handle null expenses gracefully', () async {
@@ -277,9 +284,84 @@ void main() {
 
       // Assert
       final state = container.read(budgetControllerProvider);
-      expect(state, isA<AsyncData<List<ExpenseModel>>>());
+      expect(state, isA<AsyncData<BudgetModel>>());
       expect(state.value, isNotNull);
-      expect(state.value!.isEmpty, isTrue);
+      expect(state.value!.expenses.isEmpty, isTrue);
+      expect(state.value!.totalExpense, equals(0.0));
+    });
+
+    test(
+      'should calculate total expense correctly with multiple expenses',
+      () async {
+        // Arrange
+        final mockExpenses = [
+          ExpenseModel(
+            id: '1',
+            name: 'Expense 1',
+            amount: 25.50,
+            createdAt: DateTime(2024, 1, 1),
+          ),
+          ExpenseModel(
+            id: '2',
+            name: 'Expense 2',
+            amount: 75.25,
+            createdAt: DateTime(2024, 1, 2),
+          ),
+          ExpenseModel(
+            id: '3',
+            name: 'Expense 3',
+            amount: 100.00,
+            createdAt: DateTime(2024, 1, 3),
+          ),
+        ];
+        mockBudgetService.setMockExpenses(mockExpenses);
+        final controller = container.read(budgetControllerProvider.notifier);
+
+        // Act
+        await controller.fetchExpenses();
+
+        // Assert
+        final state = container.read(budgetControllerProvider);
+        expect(state, isA<AsyncData<BudgetModel>>());
+        final budgetModel = state.value;
+        expect(budgetModel, isNotNull);
+        expect(budgetModel!.expenses.length, equals(3));
+        expect(budgetModel.totalExpense, equals(200.75));
+      },
+    );
+
+    test('should handle copyWith method correctly', () async {
+      // Arrange
+      final mockExpenses = [
+        ExpenseModel(
+          id: '1',
+          name: 'Original Expense',
+          amount: 50.0,
+          createdAt: DateTime(2024, 1, 1),
+        ),
+      ];
+      mockBudgetService.setMockExpenses(mockExpenses);
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act
+      await controller.fetchExpenses();
+      final originalBudget = container.read(budgetControllerProvider).value!;
+      final updatedBudget = originalBudget.copyWith(
+        expenses: [
+          ExpenseModel(
+            id: '2',
+            name: 'Updated Expense',
+            amount: 75.0,
+            createdAt: DateTime(2024, 1, 2),
+          ),
+        ],
+      );
+
+      // Assert
+      expect(updatedBudget.expenses.length, equals(1));
+      expect(updatedBudget.totalExpense, equals(75.0));
+      expect(updatedBudget.expenses[0].name, equals('Updated Expense'));
+      expect(originalBudget.expenses[0].name, equals('Original Expense'));
     });
   });
 }
