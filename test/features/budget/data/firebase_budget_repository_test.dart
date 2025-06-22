@@ -216,7 +216,7 @@ void main() {
     test('provides FirebaseBudgetRepository instance', () {
       expect(
         firebaseBudgetRepositoryProvider,
-        isA<Provider<BudgetRepository>>(),
+        isA<ProviderFamily<BudgetRepository, String>>(),
       );
     });
   });

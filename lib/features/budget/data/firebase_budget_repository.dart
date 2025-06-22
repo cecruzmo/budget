@@ -45,7 +45,7 @@ class FirebaseBudgetRepository implements BudgetRepository {
   }
 }
 
-final firebaseBudgetRepositoryProvider = Provider<BudgetRepository>((ref) {
-  const userId = 'jlH0UrhFqKabFljFXz7wfy4Xk0u2';
+final firebaseBudgetRepositoryProvider =
+    Provider.family<BudgetRepository, String>((ref, userId) {
   return FirebaseBudgetRepository(userId: userId);
 });

@@ -23,7 +23,7 @@ void main() {
       // Arrange
       when(
         () => mockRepository.getCurrentUser(),
-      ).thenAnswer((_) async => mockUser);
+      ).thenReturn(mockUser);
 
       // Act
       final result = await userService.initUser();
@@ -36,7 +36,7 @@ void main() {
 
     test('initUser creates anonymous user when no user exists', () async {
       // Arrange
-      when(() => mockRepository.getCurrentUser()).thenAnswer((_) async => null);
+      when(() => mockRepository.getCurrentUser()).thenReturn(null);
       when(
         () => mockRepository.createAnonymousUser(),
       ).thenAnswer((_) async => mockUser);
@@ -68,10 +68,10 @@ void main() {
       // Arrange
       when(
         () => mockRepository.getCurrentUser(),
-      ).thenAnswer((_) async => mockUser);
+      ).thenReturn(mockUser);
 
       // Act
-      final result = await userService.getCurrentUser();
+      final result = userService.getCurrentUser();
 
       // Assert
       expect(result, equals(mockUser));
@@ -80,10 +80,10 @@ void main() {
 
     test('getCurrentUser returns null when no user exists', () async {
       // Arrange
-      when(() => mockRepository.getCurrentUser()).thenAnswer((_) async => null);
+      when(() => mockRepository.getCurrentUser()).thenReturn(null);
 
       // Act
-      final result = await userService.getCurrentUser();
+      final result = userService.getCurrentUser();
 
       // Assert
       expect(result, isNull);

@@ -6,6 +6,9 @@ abstract class BudgetRepository {
   Future<List<ExpenseModel>> fetchExpenses();
 }
 
-final budgetRepositoryProvider = Provider<BudgetRepository>((ref) {
-  return ref.watch(firebaseBudgetRepositoryProvider);
+final budgetRepositoryProvider = Provider.family<BudgetRepository, String>((
+  ref,
+  userId,
+) {
+  return ref.watch(firebaseBudgetRepositoryProvider(userId));
 });
