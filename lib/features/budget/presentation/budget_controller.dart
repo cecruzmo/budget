@@ -7,6 +7,11 @@ class BudgetController extends StateNotifier<AsyncValue<BudgetModel>> {
 
   BudgetController(this._budgetService) : super(const AsyncValue.loading());
 
+  Future<bool> isBudgetCreated() async =>
+      await _budgetService.isBudgetCreated();
+
+  Future<void> createBudget() async => await _budgetService.createBudget();
+
   Future<void> fetchExpenses() async {
     state = await AsyncValue.guard(() async {
       final expenses = await _budgetService.fetchExpenses();

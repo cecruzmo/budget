@@ -15,6 +15,13 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(budgetControllerProvider.notifier).isBudgetCreated().then((
+        isBudgetCreated,
+      ) async {
+        if (!isBudgetCreated) {
+          await ref.read(budgetControllerProvider.notifier).createBudget();
+        }
+      });
       ref.read(budgetControllerProvider.notifier).fetchExpenses();
     });
   }

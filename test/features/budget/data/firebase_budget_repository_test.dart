@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:budget/features/budget/data/firebase_budget_repository.dart';
 import 'package:budget/features/budget/data/budget_repository.dart';
+import 'package:budget/features/budget/domain/firebase_budget_model.dart';
 
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
@@ -63,6 +64,117 @@ void main() {
       when(
         () => mockBudgetsCollection.where('userId', isEqualTo: testUserId),
       ).thenReturn(mockBudgetsCollection);
+    });
+
+    group('isBudgetCreated', () {
+      test('returns true when budget exists for user', () async {
+        // Arrange
+        when(
+          () => mockBudgetsCollection.get(),
+        ).thenAnswer((_) async => mockBudgetQuerySnapshot);
+        when(() => mockBudgetQuerySnapshot.docs).thenReturn([mockBudgetDoc]);
+
+        // Act
+        final result = await repository.isBudgetCreated();
+
+        // Assert
+        expect(result, isTrue);
+        verify(
+          () => mockBudgetsCollection.where('userId', isEqualTo: testUserId),
+        ).called(1);
+        verify(() => mockBudgetsCollection.get()).called(1);
+      });
+
+      test('returns false when no budget exists for user', () async {
+        // Arrange
+        when(
+          () => mockBudgetsCollection.get(),
+        ).thenAnswer((_) async => mockBudgetQuerySnapshot);
+        when(() => mockBudgetQuerySnapshot.docs).thenReturn([]);
+
+        // Act
+        final result = await repository.isBudgetCreated();
+
+        // Assert
+        expect(result, isFalse);
+        verify(
+          () => mockBudgetsCollection.where('userId', isEqualTo: testUserId),
+        ).called(1);
+        verify(() => mockBudgetsCollection.get()).called(1);
+      });
+
+      test('throws exception when Firestore query fails', () async {
+        // Arrange
+        when(() => mockBudgetsCollection.get()).thenThrow(
+          FirebaseException(plugin: 'firestore', message: 'Network error'),
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.isBudgetCreated(),
+          throwsA(isA<FirebaseException>()),
+        );
+      });
+    });
+
+    group('createBudget', () {
+      test('successfully creates budget with correct data', () async {
+        // Arrange
+        when(
+          () => mockBudgetsCollection.add(any()),
+        ).thenAnswer((_) async => mockBudgetDocRef);
+
+        // Act
+        await repository.createBudget();
+
+        // Assert
+        verify(() => mockBudgetsCollection.add(any())).called(1);
+
+        // Verify the data passed to add() contains the expected fields
+        final capturedData =
+            verify(() => mockBudgetsCollection.add(captureAny())).captured.first
+                as Map<String, dynamic>;
+        expect(capturedData['userId'], testUserId);
+        expect(capturedData['createdAt'], isA<FieldValue>());
+        expect(capturedData['updatedAt'], isA<FieldValue>());
+      });
+
+      test('throws exception when Firestore add operation fails', () async {
+        // Arrange
+        when(() => mockBudgetsCollection.add(any())).thenThrow(
+          FirebaseException(plugin: 'firestore', message: 'Permission denied'),
+        );
+
+        // Act & Assert
+        expect(
+          () => repository.createBudget(),
+          throwsA(isA<FirebaseException>()),
+        );
+      });
+
+      test('creates budget with FirebaseBudgetModel data', () async {
+        // Arrange
+        when(
+          () => mockBudgetsCollection.add(any()),
+        ).thenAnswer((_) async => mockBudgetDocRef);
+
+        // Act
+        await repository.createBudget();
+
+        // Assert
+        verify(() => mockBudgetsCollection.add(any())).called(1);
+
+        // Verify the data matches what FirebaseBudgetModel.toFirebaseMap() would return
+        final capturedData =
+            verify(() => mockBudgetsCollection.add(captureAny())).captured.first
+                as Map<String, dynamic>;
+        final expectedModel = FirebaseBudgetModel(userId: testUserId);
+        final expectedData = expectedModel.toFirebaseMap();
+
+        expect(capturedData['userId'], expectedData['userId']);
+        expect(capturedData['createdAt'], expectedData['createdAt']);
+        expect(capturedData['updatedAt'], expectedData['updatedAt']);
+      });
     });
 
     group('fetchExpenses', () {
