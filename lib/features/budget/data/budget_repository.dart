@@ -3,6 +3,8 @@ import 'package:budget/features/budget/domain/expense_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class BudgetRepository {
+  Future<bool> isBudgetCreated();
+  Future<void> createBudget();
   Future<List<ExpenseModel>> fetchExpenses();
 }
 

@@ -7,7 +7,9 @@ import 'package:budget/features/budget/domain/budget_model.dart';
 
 class MockBudgetService implements BudgetService {
   List<ExpenseModel>? _mockExpenses;
+  bool _isBudgetCreated = false;
   Exception? _mockError;
+  Exception? _createBudgetError;
 
   void setMockExpenses(List<ExpenseModel> expenses) {
     _mockExpenses = expenses;
@@ -17,6 +19,28 @@ class MockBudgetService implements BudgetService {
   void setMockError(Exception error) {
     _mockError = error;
     _mockExpenses = null;
+  }
+
+  void setBudgetCreated(bool isCreated) {
+    _isBudgetCreated = isCreated;
+  }
+
+  void setCreateBudgetError(Exception error) {
+    _createBudgetError = error;
+  }
+
+  @override
+  Future<bool> isBudgetCreated() async {
+    await Future.delayed(const Duration(milliseconds: 10));
+    return _isBudgetCreated;
+  }
+
+  @override
+  Future<void> createBudget() async {
+    await Future.delayed(const Duration(milliseconds: 10));
+    if (_createBudgetError != null) {
+      throw _createBudgetError!;
+    }
   }
 
   @override
@@ -50,6 +74,63 @@ void main() {
 
     tearDown(() {
       container.dispose();
+    });
+
+    test('should check if budget is created successfully', () async {
+      // Arrange
+      mockBudgetService.setBudgetCreated(true);
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act
+      final result = await controller.isBudgetCreated();
+
+      // Assert
+      expect(result, isTrue);
+    });
+
+    test('should return false when budget is not created', () async {
+      // Arrange
+      mockBudgetService.setBudgetCreated(false);
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act
+      final result = await controller.isBudgetCreated();
+
+      // Assert
+      expect(result, isFalse);
+    });
+
+    test('should create budget successfully', () async {
+      // Arrange
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act & Assert
+      expect(() => controller.createBudget(), returnsNormally);
+    });
+
+    test('should handle create budget error', () async {
+      // Arrange
+      final mockError = Exception('Failed to create budget');
+      mockBudgetService.setCreateBudgetError(mockError);
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act & Assert
+      expect(() => controller.createBudget(), throwsA(equals(mockError)));
+    });
+
+    test('should handle state changes in isBudgetCreated', () async {
+      // Arrange
+      final controller = container.read(budgetControllerProvider.notifier);
+
+      // Act & Assert (Initial state - false)
+      mockBudgetService.setBudgetCreated(false);
+      final initialResult = await controller.isBudgetCreated();
+      expect(initialResult, isFalse);
+
+      // Act & Assert (Changed state - true)
+      mockBudgetService.setBudgetCreated(true);
+      final changedResult = await controller.isBudgetCreated();
+      expect(changedResult, isTrue);
     });
 
     test('should initialize with loading state', () {

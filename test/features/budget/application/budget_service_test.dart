@@ -16,6 +16,123 @@ void main() {
       budgetService = BudgetService(mockBudgetRepository);
     });
 
+    group('isBudgetCreated', () {
+      test('should return true when budget is created', () async {
+        // Arrange
+        when(
+          () => mockBudgetRepository.isBudgetCreated(),
+        ).thenAnswer((_) async => true);
+
+        // Act
+        final result = await budgetService.isBudgetCreated();
+
+        // Assert
+        expect(result, isTrue);
+        verify(() => mockBudgetRepository.isBudgetCreated()).called(1);
+      });
+
+      test('should return false when budget is not created', () async {
+        // Arrange
+        when(
+          () => mockBudgetRepository.isBudgetCreated(),
+        ).thenAnswer((_) async => false);
+
+        // Act
+        final result = await budgetService.isBudgetCreated();
+
+        // Assert
+        expect(result, isFalse);
+        verify(() => mockBudgetRepository.isBudgetCreated()).called(1);
+      });
+
+      test(
+        'should propagate exception when repository throws an error',
+        () async {
+          // Arrange
+          final exception = Exception('Failed to check budget status');
+          when(
+            () => mockBudgetRepository.isBudgetCreated(),
+          ).thenThrow(exception);
+
+          // Act & Assert
+          expect(
+            () => budgetService.isBudgetCreated(),
+            throwsA(equals(exception)),
+          );
+          verify(() => mockBudgetRepository.isBudgetCreated()).called(1);
+        },
+      );
+
+      test(
+        'should call repository exactly once per isBudgetCreated call',
+        () async {
+          // Arrange
+          when(
+            () => mockBudgetRepository.isBudgetCreated(),
+          ).thenAnswer((_) async => true);
+
+          // Act
+          await budgetService.isBudgetCreated();
+          await budgetService.isBudgetCreated();
+
+          // Assert
+          verify(() => mockBudgetRepository.isBudgetCreated()).called(2);
+        },
+      );
+    });
+
+    group('createBudget', () {
+      test(
+        'should complete successfully when repository call succeeds',
+        () async {
+          // Arrange
+          when(
+            () => mockBudgetRepository.createBudget(),
+          ).thenAnswer((_) async {});
+
+          // Act
+          await budgetService.createBudget();
+
+          // Assert
+          verify(() => mockBudgetRepository.createBudget()).called(1);
+        },
+      );
+
+      test(
+        'should propagate exception when repository throws an error',
+        () async {
+          // Arrange
+          final exception = Exception('Failed to create budget');
+          when(() => mockBudgetRepository.createBudget()).thenThrow(exception);
+
+          // Act & Assert
+          expect(
+            () => budgetService.createBudget(),
+            throwsA(equals(exception)),
+          );
+          verify(() => mockBudgetRepository.createBudget()).called(1);
+        },
+      );
+
+      test(
+        'should call repository exactly once per createBudget call',
+        () async {
+          // Arrange
+          when(
+            () => mockBudgetRepository.createBudget(),
+          ).thenAnswer((_) async {});
+
+          // Act
+          await budgetService.createBudget();
+          await budgetService.createBudget();
+          await budgetService.createBudget();
+
+          // Assert
+          verify(() => mockBudgetRepository.createBudget()).called(3);
+        },
+      );
+    });
+
     group('fetchExpenses', () {
       test(
         'should return list of expenses when repository call is successful',

@@ -8,6 +8,11 @@ class BudgetService {
 
   BudgetService(this._budgetRepository);
 
+  Future<bool> isBudgetCreated() async =>
+      await _budgetRepository.isBudgetCreated();
+
+  Future<void> createBudget() async => await _budgetRepository.createBudget();
+  
   Future<List<ExpenseModel>> fetchExpenses() async =>
       await _budgetRepository.fetchExpenses();
 }
