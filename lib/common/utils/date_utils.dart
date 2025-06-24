@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'locale_utils.dart';
 
 class DateUtils {
   static DateTime parseFirebaseTimestamp(dynamic value) {
@@ -15,5 +17,10 @@ class DateUtils {
 
   static int toFirebaseTimestamp(DateTime dateTime) {
     return dateTime.millisecondsSinceEpoch;
+  }
+
+  static String formatDate(DateTime date) {
+    final formatter = DateFormat('d.M', LocaleUtils.getLocale());
+    return formatter.format(date);
   }
 }

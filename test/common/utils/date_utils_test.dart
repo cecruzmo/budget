@@ -187,5 +187,96 @@ void main() {
         expect(result, equals(expectedMilliseconds));
       });
     });
+
+    group('formatDate', () {
+      test('should format date with day and month', () {
+        // Arrange
+        final testDateTime = DateTime(2024, 1, 15);
+
+        // Act
+        final result = DateUtils.formatDate(testDateTime);
+
+        // Assert
+        expect(result, equals('15.1'));
+      });
+
+      test('should format date with single digit day and month', () {
+        // Arrange
+        final testDateTime = DateTime(2024, 3, 5);
+
+        // Act
+        final result = DateUtils.formatDate(testDateTime);
+
+        // Assert
+        expect(result, equals('5.3'));
+      });
+
+      test('should format date with double digit day and month', () {
+        // Arrange
+        final testDateTime = DateTime(2024, 12, 25);
+
+        // Act
+        final result = DateUtils.formatDate(testDateTime);
+
+        // Assert
+        expect(result, equals('25.12'));
+      });
+
+      test(
+        'should format date with single digit day and double digit month',
+        () {
+          // Arrange
+          final testDateTime = DateTime(2024, 10, 7);
+
+          // Act
+          final result = DateUtils.formatDate(testDateTime);
+
+          // Assert
+          expect(result, equals('7.10'));
+        },
+      );
+
+      test(
+        'should format date with double digit day and single digit month',
+        () {
+          // Arrange
+          final testDateTime = DateTime(2024, 4, 20);
+
+          // Act
+          final result = DateUtils.formatDate(testDateTime);
+
+          // Assert
+          expect(result, equals('20.4'));
+        },
+      );
+
+      test('should format date with time components (should ignore time)', () {
+        // Arrange
+        final testDateTime = DateTime(2024, 6, 15, 14, 30, 45, 123);
+
+        // Act
+        final result = DateUtils.formatDate(testDateTime);
+
+        // Assert
+        expect(result, equals('15.6'));
+      });
+
+      test('should format date with different years (should ignore year)', () {
+        // Arrange
+        final testDateTime1 = DateTime(2023, 8, 10);
+        final testDateTime2 = DateTime(2024, 8, 10);
+        final testDateTime3 = DateTime(2025, 8, 10);
+
+        // Act
+        final result1 = DateUtils.formatDate(testDateTime1);
+        final result2 = DateUtils.formatDate(testDateTime2);
+        final result3 = DateUtils.formatDate(testDateTime3);
+
+        // Assert
+        expect(result1, equals('10.8'));
+        expect(result2, equals('10.8'));
+        expect(result3, equals('10.8'));
+      });
+    });
   });
 }

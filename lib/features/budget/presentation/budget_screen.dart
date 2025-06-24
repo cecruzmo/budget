@@ -1,7 +1,11 @@
+import 'package:budget/common/utils/colors.dart';
+import 'package:budget/common/presentation/section_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:budget/features/budget/presentation/budget_controller.dart';
+import 'package:budget/common/utils/money_utils.dart';
+import 'package:budget/features/budget/presentation/expense_item.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
@@ -30,45 +34,28 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [_totalExpenseCard(context), _expensesList(context)],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_total(context), _expenses(context)],
+          ),
         ),
       ),
     );
   }
 
-  Widget _totalExpenseCard(BuildContext context) {
+  Widget _total(BuildContext context) {
     final budgetAsync = ref.watch(budgetControllerProvider);
     return budgetAsync.when(
-      data: (budgetModel) => Card(
-        margin: const EdgeInsets.all(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Text(
-                'Total Expenses',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '\$${budgetModel.totalExpense.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ],
-          ),
+      data: (budgetModel) => Text(
+        MoneyUtils.formatMoney(budgetModel.totalExpense),
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: AppColors.gunmetal,
         ),
       ),
-      loading: () => const Card(
-        margin: EdgeInsets.all(16),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
+      loading: () => Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) => Card(
         margin: const EdgeInsets.all(16),
         child: Padding(
@@ -84,35 +71,23 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     );
   }
 
-  Widget _expensesList(BuildContext context) {
+  Widget _expenses(BuildContext context) {
     final budgetAsync = ref.watch(budgetControllerProvider);
     return budgetAsync.when(
-      data: (budgetModel) => Expanded(
-        child: budgetModel.expenses.isEmpty
-            ? const Center(child: Text('No expenses found'))
-            : ListView.builder(
-                itemCount: budgetModel.expenses.length,
-                itemBuilder: (context, index) {
-                  final expense = budgetModel.expenses[index];
-                  return ListTile(
-                    title: Text(expense.name),
-                    subtitle: Text(expense.createdAt.toString()),
-                    trailing: Text(
-                      '\$${expense.amount.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  );
-                },
-              ),
-      ),
-      loading: () =>
-          const Expanded(child: Center(child: CircularProgressIndicator())),
-      error: (error, stackTrace) => Expanded(
-        child: Center(
-          child: Text(
-            'Error: $error',
-            style: Theme.of(context).textTheme.bodyLarge,
+      data: (budgetModel) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionTitle(title: 'EXPENSES'),
+          ...budgetModel.expenses.map(
+            (expense) => ExpenseItem(expense: expense),
           ),
+        ],
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(
+        child: Text(
+          'Error: $error',
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),
     );
