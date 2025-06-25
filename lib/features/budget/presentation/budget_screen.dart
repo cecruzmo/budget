@@ -52,10 +52,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         MoneyUtils.formatMoney(budgetModel.totalExpense),
         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: AppColors.gunmetal,
         ),
       ),
-      loading: () => Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stackTrace) => Card(
         margin: const EdgeInsets.all(16),
         child: Padding(
