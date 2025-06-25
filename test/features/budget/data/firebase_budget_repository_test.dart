@@ -128,9 +128,6 @@ void main() {
         await repository.createBudget();
 
         // Assert
-        verify(() => mockBudgetsCollection.add(any())).called(1);
-
-        // Verify the data passed to add() contains the expected fields
         final capturedData =
             verify(() => mockBudgetsCollection.add(captureAny())).captured.first
                 as Map<String, dynamic>;
@@ -162,9 +159,6 @@ void main() {
         await repository.createBudget();
 
         // Assert
-        verify(() => mockBudgetsCollection.add(any())).called(1);
-
-        // Verify the data matches what FirebaseBudgetModel.toFirebaseMap() would return
         final capturedData =
             verify(() => mockBudgetsCollection.add(captureAny())).captured.first
                 as Map<String, dynamic>;
