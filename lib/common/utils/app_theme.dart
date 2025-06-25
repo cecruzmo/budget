@@ -10,11 +10,10 @@ class AppTheme {
       primary: AppColors.gunmetal,
       secondary: AppColors.gunmetal,
       surface: Colors.white,
-      background: AppColors.ghostWhite,
+      surfaceTint: AppColors.ghostWhite,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: AppColors.gunmetal,
-      onBackground: AppColors.gunmetal,
     ),
     scaffoldBackgroundColor: AppColors.ghostWhite,
     appBarTheme: const AppBarTheme(

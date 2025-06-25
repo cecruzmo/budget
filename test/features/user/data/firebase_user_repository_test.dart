@@ -39,7 +39,7 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(null);
 
         // Act
-        final result = await repository.getCurrentUser();
+        final result = repository.getCurrentUser();
 
         // Assert
         expect(result, null);
@@ -51,7 +51,7 @@ void main() {
         when(() => mockAuth.currentUser).thenReturn(mockUser);
 
         // Act
-        final result = await repository.getCurrentUser();
+        final result = repository.getCurrentUser();
 
         // Assert
         expect(result, isA<UserModel>());
