@@ -81,13 +81,8 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ),
         ],
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stackTrace) => Center(
-        child: Text(
-          'Error: $error',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-      ),
+      loading: () => const SizedBox(),
+      error: (error, stackTrace) => const SizedBox(),
     );
   }
 }
