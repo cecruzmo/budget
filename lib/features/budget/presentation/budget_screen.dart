@@ -1,4 +1,3 @@
-import 'package:budget/common/utils/colors.dart';
 import 'package:budget/common/presentation/section_title.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
