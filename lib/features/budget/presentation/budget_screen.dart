@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:budget/features/budget/presentation/budget_controller.dart';
 import 'package:budget/common/utils/money_utils.dart';
 import 'package:budget/features/budget/presentation/expense_item.dart';
+import 'package:budget/common/utils/colors.dart';
+import 'package:budget/features/budget/presentation/add_expense_item.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
@@ -14,6 +16,8 @@ class BudgetScreen extends ConsumerStatefulWidget {
 }
 
 class _BudgetScreenState extends ConsumerState<BudgetScreen> {
+  bool _showAddExpenseItem = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +45,13 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
           ),
         ),
       ),
+      floatingActionButton: _showAddExpenseItem
+          ? null
+          : FloatingActionButton(
+              onPressed: () => setState(() => _showAddExpenseItem = true),
+              backgroundColor: AppColors.gunmetal,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
     );
   }
 
@@ -76,6 +87,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SectionTitle(title: 'EXPENSES'),
+          if (_showAddExpenseItem) const AddExpenseItem(),
           ...budgetModel.expenses.map(
             (expense) => ExpenseItem(expense: expense),
           ),
