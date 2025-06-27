@@ -21,13 +21,24 @@ class _AddExpenseItemState extends ConsumerState<AddExpenseItem> {
   final FocusNode _amountFocusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onTextChanged);
+    _amountController.addListener(_onTextChanged);
+  }
+
+  @override
   void dispose() {
+    _nameController.removeListener(_onTextChanged);
+    _amountController.removeListener(_onTextChanged);
     _nameController.dispose();
     _amountController.dispose();
     _nameFocusNode.dispose();
     _amountFocusNode.dispose();
     super.dispose();
   }
+
+  void _onTextChanged() => setState(() {});
 
   void _handleSubmit() {
     final name = _nameController.text.trim();
@@ -143,11 +154,40 @@ class _AddExpenseItemState extends ConsumerState<AddExpenseItem> {
                 onSubmitted: (_) => _handleSubmit(),
               ),
             ),
-            if (addExpenseState.isLoading)
-              const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+            const SizedBox(width: 8),
+            if (_nameController.text.trim().isNotEmpty &&
+                _amountController.text.trim().isNotEmpty)
+              Container(
+                decoration: BoxDecoration(
+                  color: addExpenseState.isLoading
+                      ? AppColors.gunmetal.withValues(alpha: 0.1)
+                      : AppColors.gunmetal,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: addExpenseState.isLoading ? null : _handleSubmit,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      alignment: Alignment.center,
+                      child: addExpenseState.isLoading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : Icon(Icons.check, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
               ),
           ],
         ),
