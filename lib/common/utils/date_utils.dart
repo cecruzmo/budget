@@ -15,8 +15,8 @@ class DateUtils {
     );
   }
 
-  static int toFirebaseTimestamp(DateTime dateTime) {
-    return dateTime.millisecondsSinceEpoch;
+  static FieldValue toFirebaseTimestamp(DateTime dateTime) {
+    return FieldValue.serverTimestamp();
   }
 
   static String formatDate(DateTime date) {

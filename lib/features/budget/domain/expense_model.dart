@@ -1,4 +1,5 @@
 import 'package:budget/common/utils/date_utils.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ExpenseModel {
   final String id;
@@ -27,12 +28,11 @@ class ExpenseModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirebaseMap() {
     return {
-      'id': id,
       'name': name,
       'amount': amount,
-      'createdAt': DateUtils.toFirebaseTimestamp(createdAt),
+      'createdAt': FieldValue.serverTimestamp(),
     };
   }
 

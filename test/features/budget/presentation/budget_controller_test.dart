@@ -10,6 +10,7 @@ class MockBudgetService implements BudgetService {
   bool _isBudgetCreated = false;
   Exception? _mockError;
   Exception? _createBudgetError;
+  Exception? _addExpenseError;
 
   void setMockExpenses(List<ExpenseModel> expenses) {
     _mockExpenses = expenses;
@@ -27,6 +28,10 @@ class MockBudgetService implements BudgetService {
 
   void setCreateBudgetError(Exception error) {
     _createBudgetError = error;
+  }
+
+  void setAddExpenseError(Exception error) {
+    _addExpenseError = error;
   }
 
   @override
@@ -50,6 +55,14 @@ class MockBudgetService implements BudgetService {
       throw _mockError!;
     }
     return _mockExpenses ?? [];
+  }
+
+  @override
+  Future<void> addExpense(ExpenseModel expense) async {
+    await Future.delayed(const Duration(milliseconds: 10));
+    if (_addExpenseError != null) {
+      throw _addExpenseError!;
+    }
   }
 }
 

@@ -64,6 +64,29 @@ class FirebaseBudgetRepository implements BudgetRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<void> addExpense(ExpenseModel expense) async {
+    try {
+      final budgetQuerySnapshot = await _firestore
+          .collection('budgets')
+          .where('userId', isEqualTo: _userId)
+          .get();
+
+      if (budgetQuerySnapshot.docs.isEmpty) {
+        throw Exception('Budget not found for user');
+      }
+
+      final budgetDoc = budgetQuerySnapshot.docs.first;
+
+      await budgetDoc.reference
+          .collection('expenses')
+          .add(expense.toFirebaseMap());
+    } catch (e) {
+      print('Error adding expense to Firebase: $e');
+      rethrow;
+    }
+  }
 }
 
 final firebaseBudgetRepositoryProvider =

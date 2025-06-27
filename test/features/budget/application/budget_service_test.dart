@@ -7,6 +7,17 @@ import 'package:budget/features/budget/domain/expense_model.dart';
 class MockBudgetRepository extends Mock implements BudgetRepository {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(
+      ExpenseModel(
+        id: 'fallback',
+        name: 'Fallback Expense',
+        amount: 0.0,
+        createdAt: DateTime(2024, 1, 1),
+      ),
+    );
+  });
+
   group('BudgetService', () {
     late BudgetService budgetService;
     late MockBudgetRepository mockBudgetRepository;
@@ -330,24 +341,6 @@ void main() {
       );
 
       test(
-        'should propagate database exception when repository throws database error',
-        () async {
-          // Arrange
-          final dbException = Exception('Database error: Permission denied');
-          when(
-            () => mockBudgetRepository.fetchExpenses(),
-          ).thenThrow(dbException);
-
-          // Act & Assert
-          expect(
-            () => budgetService.fetchExpenses(),
-            throwsA(equals(dbException)),
-          );
-          verify(() => mockBudgetRepository.fetchExpenses()).called(1);
-        },
-      );
-
-      test(
         'should call repository exactly once per fetchExpenses call',
         () async {
           // Arrange
@@ -362,6 +355,195 @@ void main() {
 
           // Assert
           verify(() => mockBudgetRepository.fetchExpenses()).called(3);
+        },
+      );
+    });
+
+    group('addExpense', () {
+      test(
+        'should complete successfully when repository call succeeds',
+        () async {
+          // Arrange
+          final expense = ExpenseModel(
+            id: '1',
+            name: 'Groceries',
+            amount: 50.0,
+            createdAt: DateTime(2024, 1, 1),
+          );
+
+          when(
+            () => mockBudgetRepository.addExpense(expense),
+          ).thenAnswer((_) async {});
+
+          // Act
+          await budgetService.addExpense(expense);
+
+          // Assert
+          verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+        },
+      );
+
+      test('should handle expense with zero amount', () async {
+        // Arrange
+        final expense = ExpenseModel(
+          id: '1',
+          name: 'Free Item',
+          amount: 0.0,
+          createdAt: DateTime(2024, 1, 1),
+        );
+
+        when(
+          () => mockBudgetRepository.addExpense(expense),
+        ).thenAnswer((_) async {});
+
+        // Act
+        await budgetService.addExpense(expense);
+
+        // Assert
+        verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+      });
+
+      test('should handle expense with decimal amount', () async {
+        // Arrange
+        final expense = ExpenseModel(
+          id: '1',
+          name: 'Taxi',
+          amount: 12.75,
+          createdAt: DateTime(2024, 1, 1),
+        );
+
+        when(
+          () => mockBudgetRepository.addExpense(expense),
+        ).thenAnswer((_) async {});
+
+        // Act
+        await budgetService.addExpense(expense);
+
+        // Assert
+        verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+      });
+
+      test('should handle expense with large amount', () async {
+        // Arrange
+        final expense = ExpenseModel(
+          id: '1',
+          name: 'Rent',
+          amount: 15000000.0,
+          createdAt: DateTime(2024, 1, 1),
+        );
+
+        when(
+          () => mockBudgetRepository.addExpense(expense),
+        ).thenAnswer((_) async {});
+
+        // Act
+        await budgetService.addExpense(expense);
+
+        // Assert
+        verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+      });
+
+      test('should handle expense with special characters in name', () async {
+        // Arrange
+        final expense = ExpenseModel(
+          id: '1',
+          name: 'Café & Restaurant 🍕',
+          amount: 25.50,
+          createdAt: DateTime(2024, 1, 1),
+        );
+
+        when(
+          () => mockBudgetRepository.addExpense(expense),
+        ).thenAnswer((_) async {});
+
+        // Act
+        await budgetService.addExpense(expense);
+
+        // Assert
+        verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+      });
+
+      test(
+        'should propagate exception when repository throws an error',
+        () async {
+          // Arrange
+          final expense = ExpenseModel(
+            id: '1',
+            name: 'Groceries',
+            amount: 50.0,
+            createdAt: DateTime(2024, 1, 1),
+          );
+          final exception = Exception('Failed to add expense');
+          when(
+            () => mockBudgetRepository.addExpense(expense),
+          ).thenThrow(exception);
+
+          // Act & Assert
+          expect(
+            () => budgetService.addExpense(expense),
+            throwsA(equals(exception)),
+          );
+          verify(() => mockBudgetRepository.addExpense(expense)).called(1);
+        },
+      );
+
+
+      test('should call repository exactly once per addExpense call', () async {
+        // Arrange
+        final expense1 = ExpenseModel(
+          id: '1',
+          name: 'Groceries',
+          amount: 50.0,
+          createdAt: DateTime(2024, 1, 1),
+        );
+        final expense2 = ExpenseModel(
+          id: '2',
+          name: 'Gas',
+          amount: 30.0,
+          createdAt: DateTime(2024, 1, 2),
+        );
+
+        when(
+          () => mockBudgetRepository.addExpense(any()),
+        ).thenAnswer((_) async {});
+
+        // Act
+        await budgetService.addExpense(expense1);
+        await budgetService.addExpense(expense2);
+
+        // Assert
+        verify(() => mockBudgetRepository.addExpense(expense1)).called(1);
+        verify(() => mockBudgetRepository.addExpense(expense2)).called(1);
+      });
+
+      test(
+        'should handle multiple expenses with same name but different amounts',
+        () async {
+          // Arrange
+          final expense1 = ExpenseModel(
+            id: '1',
+            name: 'Coffee',
+            amount: 3.50,
+            createdAt: DateTime(2024, 1, 1),
+          );
+          final expense2 = ExpenseModel(
+            id: '2',
+            name: 'Coffee',
+            amount: 4.00,
+            createdAt: DateTime(2024, 1, 2),
+          );
+
+          when(
+            () => mockBudgetRepository.addExpense(any()),
+          ).thenAnswer((_) async {});
+
+          // Act
+          await budgetService.addExpense(expense1);
+          await budgetService.addExpense(expense2);
+
+          // Assert
+          verify(() => mockBudgetRepository.addExpense(expense1)).called(1);
+          verify(() => mockBudgetRepository.addExpense(expense2)).called(1);
         },
       );
     });

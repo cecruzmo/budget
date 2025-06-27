@@ -15,6 +15,9 @@ class BudgetService {
   
   Future<List<ExpenseModel>> fetchExpenses() async =>
       await _budgetRepository.fetchExpenses();
+
+  Future<void> addExpense(ExpenseModel expense) async =>
+      await _budgetRepository.addExpense(expense);
 }
 
 final budgetServiceProvider = Provider<BudgetService>((ref) {
