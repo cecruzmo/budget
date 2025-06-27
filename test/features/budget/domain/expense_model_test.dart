@@ -97,7 +97,7 @@ void main() {
       expect(modifiedExpense.createdAt, equals(newDate));
     });
 
-    test('should convert to map correctly', () {
+    test('should convert to Firebase map correctly', () {
       // Arrange
       final expense = ExpenseModel(
         id: testId,
@@ -107,13 +107,14 @@ void main() {
       );
 
       // Act
-      final map = expense.toMap();
+      final map = expense.toFirebaseMap();
 
       // Assert
-      expect(map['id'], equals(testId));
       expect(map['name'], equals(testName));
       expect(map['amount'], equals(testAmount));
-      expect(map['createdAt'], equals(testDate.millisecondsSinceEpoch));
+      expect(map['createdAt'], isA<FieldValue>());
+      expect(map['createdAt'], equals(FieldValue.serverTimestamp()));
+      expect(map.containsKey('id'), isFalse);
     });
 
     test('should create from map with valid data', () {
@@ -153,7 +154,7 @@ void main() {
       expect(expense.createdAt, equals(testDate));
     });
 
-    test('should throw exception from map with null values', () {
+    test('should handle null values in map with defaults', () {
       // Arrange
       final map = <String, dynamic>{};
 
@@ -179,7 +180,7 @@ void main() {
       expect(expense.amount, equals(100.0));
     });
 
-    test('should handle round-trip conversion (toMap -> fromMap)', () {
+    test('should handle round-trip conversion (toFirebaseMap -> fromMap)', () {
       // Arrange
       final originalExpense = ExpenseModel(
         id: testId,
@@ -188,8 +189,12 @@ void main() {
         createdAt: testDate,
       );
 
-      // Act
-      final map = originalExpense.toMap();
+      // Act - Create a map that can be converted back (using timestamp instead of FieldValue)
+      final map = {
+        'name': originalExpense.name,
+        'amount': originalExpense.amount,
+        'createdAt': originalExpense.createdAt.millisecondsSinceEpoch,
+      };
       final reconstructedExpense = ExpenseModel.fromMap(map, testId);
 
       // Assert
@@ -261,6 +266,84 @@ void main() {
 
       // Assert
       expect(expense.name, equals(specialName));
+    });
+
+    test('should handle null name in map', () {
+      // Arrange
+      final map = {
+        'name': null,
+        'amount': testAmount,
+        'createdAt': testDate.millisecondsSinceEpoch,
+      };
+
+      // Act
+      final expense = ExpenseModel.fromMap(map, testId);
+
+      // Assert
+      expect(expense.name, equals(''));
+    });
+
+    test('should handle null amount in map', () {
+      // Arrange
+      final map = {
+        'name': testName,
+        'amount': null,
+        'createdAt': testDate.millisecondsSinceEpoch,
+      };
+
+      // Act
+      final expense = ExpenseModel.fromMap(map, testId);
+
+      // Assert
+      expect(expense.amount, equals(0.0));
+    });
+
+    test('should handle null createdAt in map', () {
+      // Arrange
+      final map = {'name': testName, 'amount': testAmount, 'createdAt': null};
+
+      // Act & Assert
+      expect(
+        () => ExpenseModel.fromMap(map, testId),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('should handle invalid createdAt type in map', () {
+      // Arrange
+      final map = {
+        'name': testName,
+        'amount': testAmount,
+        'createdAt': 'invalid-date',
+      };
+
+      // Act & Assert
+      expect(
+        () => ExpenseModel.fromMap(map, testId),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('should handle negative timestamp in map', () {
+      // Arrange
+      final map = {'name': testName, 'amount': testAmount, 'createdAt': -1000};
+
+      // Act & Assert
+      expect(
+        () => ExpenseModel.fromMap(map, testId),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('should handle zero timestamp in map', () {
+      // Arrange
+      final map = {'name': testName, 'amount': testAmount, 'createdAt': 0};
+
+      // Act & Assert
+      expect(
+        () => ExpenseModel.fromMap(map, testId),
+        throwsA(isA<ArgumentError>()),
+      );
     });
   });
 }

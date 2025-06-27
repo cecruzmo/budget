@@ -201,6 +201,14 @@ class AppTheme {
       thickness: 1,
       space: 1,
     ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.gunmetal,
+      contentTextStyle: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
     iconTheme: const IconThemeData(
       color: AppColors.gunmetal,
       size: 24,

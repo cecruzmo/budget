@@ -40,7 +40,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [_total(context), _expenses(context)],
           ),
         ),
@@ -60,7 +60,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
     return budgetAsync.when(
       data: (budgetModel) => Text(
         MoneyUtils.formatMoney(budgetModel.totalExpense),
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+        style: Theme.of(
+          context,
+        ).textTheme.displayLarge?.copyWith(
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -87,7 +89,13 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SectionTitle(title: 'EXPENSES'),
-          if (_showAddExpenseItem) const AddExpenseItem(),
+          if (_showAddExpenseItem)
+            AddExpenseItem(
+              onExpenseAdded: () {
+                setState(() => _showAddExpenseItem = false);
+                ref.read(budgetControllerProvider.notifier).fetchExpenses();
+              },
+            ),
           ...budgetModel.expenses.map(
             (expense) => ExpenseItem(expense: expense),
           ),

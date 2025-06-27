@@ -139,52 +139,33 @@ void main() {
     });
 
     group('toFirebaseTimestamp', () {
-      test('should convert DateTime to milliseconds timestamp', () {
+      test('should return FieldValue.serverTimestamp()', () {
         // Arrange
         final testDateTime = DateTime(2024, 1, 15, 10, 30, 45);
-        final expectedMilliseconds = testDateTime.millisecondsSinceEpoch;
 
         // Act
         final result = DateUtils.toFirebaseTimestamp(testDateTime);
 
         // Assert
-        expect(result, equals(expectedMilliseconds));
+        expect(result, isA<FieldValue>());
+        expect(result, equals(FieldValue.serverTimestamp()));
       });
 
-      test('should handle DateTime with zero milliseconds', () {
+      test('should return FieldValue.serverTimestamp() for any DateTime', () {
         // Arrange
-        final testDateTime = DateTime.fromMillisecondsSinceEpoch(0);
-        const expectedMilliseconds = 0;
+        final testDateTime1 = DateTime.fromMillisecondsSinceEpoch(0);
+        final testDateTime2 = DateTime.now();
+        final testDateTime3 = DateTime(2024, 1, 15, 10, 30, 45, 123, 456);
 
         // Act
-        final result = DateUtils.toFirebaseTimestamp(testDateTime);
+        final result1 = DateUtils.toFirebaseTimestamp(testDateTime1);
+        final result2 = DateUtils.toFirebaseTimestamp(testDateTime2);
+        final result3 = DateUtils.toFirebaseTimestamp(testDateTime3);
 
         // Assert
-        expect(result, equals(expectedMilliseconds));
-      });
-
-      test('should handle current DateTime', () {
-        // Arrange
-        final testDateTime = DateTime.now();
-        final expectedMilliseconds = testDateTime.millisecondsSinceEpoch;
-
-        // Act
-        final result = DateUtils.toFirebaseTimestamp(testDateTime);
-
-        // Assert
-        expect(result, equals(expectedMilliseconds));
-      });
-
-      test('should handle DateTime with microseconds', () {
-        // Arrange
-        final testDateTime = DateTime(2024, 1, 15, 10, 30, 45, 123, 456);
-        final expectedMilliseconds = testDateTime.millisecondsSinceEpoch;
-
-        // Act
-        final result = DateUtils.toFirebaseTimestamp(testDateTime);
-
-        // Assert
-        expect(result, equals(expectedMilliseconds));
+        expect(result1, equals(FieldValue.serverTimestamp()));
+        expect(result2, equals(FieldValue.serverTimestamp()));
+        expect(result3, equals(FieldValue.serverTimestamp()));
       });
     });
 

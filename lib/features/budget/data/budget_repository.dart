@@ -6,6 +6,7 @@ abstract class BudgetRepository {
   Future<bool> isBudgetCreated();
   Future<void> createBudget();
   Future<List<ExpenseModel>> fetchExpenses();
+  Future<void> addExpense(ExpenseModel expense);
 }
 
 final budgetRepositoryProvider = Provider.family<BudgetRepository, String>((
